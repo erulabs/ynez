@@ -8,12 +8,8 @@ if ! [ -f "package.json" ]; then
   error "This script needs to be run from the root of the repository"
 fi
 if [[ "$@" =~ .*\-\-clean.* ]]; then
-  ./bin/clean.sh hard
+  ./bin/clean.sh
 fi
-
-generateSelfSignedCerts
-
-NODE_ENV="development" yarn --no-progress --no-emoji --prefer-offline
 
 COMPOSE_CMD="docker-compose -p '${PROJECT}' up --force-recreate -d --remove-orphans redis"
 

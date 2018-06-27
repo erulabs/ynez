@@ -1,13 +1,14 @@
-# Published as erulabs/redis4-unstable
+# Published as erulabs/redis5
 
 FROM alpine
 MAINTAINER seandon.mooy@gmail.com
 
+ENV REDIS_VERSION=5.0-rc3
 
 RUN apk add --no-cache make gcc wget unzip libc-dev linux-headers && \
-    wget --no-check-certificate https://github.com/antirez/redis/archive/unstable.zip && \
-    unzip unstable.zip && \
-    cd redis-unstable && \
+    wget --no-check-certificate https://github.com/antirez/redis/archive/${REDIS_VERSION}.zip && \
+    unzip ${REDIS_VERSION}.zip && \
+    cd redis-${REDIS_VERSION} && \
     make && \
     make install && \
     mkdir -p /etc/redis && \
@@ -15,7 +16,7 @@ RUN apk add --no-cache make gcc wget unzip libc-dev linux-headers && \
     cp -v redis.conf /etc/redis/ && \
     apk del make gcc wget unzip libc-dev linux-headers && \
     cd .. && \
-    rm -rf redis-unstable
+    rm -rf redis-${REDIS_VERSION}
 
 VOLUME ["/etc/redis"]
 

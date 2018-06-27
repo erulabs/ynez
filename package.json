@@ -1,12 +1,13 @@
 {
   "name": "redistribute",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Distributed and replayable streams, server and client",
-  "main": "index.js",
+  "main": "src/server/index.js",
   "repository": "git@github.com:erulabs/redistribute",
   "author": "erulabs <seandon.mooy@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "generic-pool": "^3.4.2",
     "ioredis": "^3.2.2"
   },
   "devDependencies": {
