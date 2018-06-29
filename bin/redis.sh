@@ -21,8 +21,10 @@ else
   exit 1
 fi
 
+DOCKER_PREFIX="docker exec -it ${PROJECT}_redis_1"
+
 if [[ "$@" != "" ]]; then
-  redis-cli -h ${DOCKER_SRV} -p ${REDIS_TARGET} $@
+  ${DOCKER_PREFIX} redis-cli -h ${DOCKER_SRV} -p ${REDIS_TARGET} $@
 else
-  redis-cli -h ${DOCKER_SRV} -p ${REDIS_TARGET}
+  ${DOCKER_PREFIX} redis-cli -h ${DOCKER_SRV} -p ${REDIS_TARGET}
 fi

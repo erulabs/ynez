@@ -2,7 +2,7 @@ version: '3'
 
 services:
   redis:
-    # image: erulabs/redis5
+    # image: erulabs/redis-unstable
     build: ./inf/images/redis
     restart: on-failure
     ports:

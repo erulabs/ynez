@@ -3,7 +3,7 @@
 FROM alpine
 MAINTAINER seandon.mooy@gmail.com
 
-ENV REDIS_VERSION=5.0-rc3
+ENV REDIS_VERSION=unstable
 
 RUN apk add --no-cache make gcc wget unzip libc-dev linux-headers && \
     wget --no-check-certificate https://github.com/antirez/redis/archive/${REDIS_VERSION}.zip && \

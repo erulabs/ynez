@@ -8,7 +8,7 @@ declare var it: Function;
 const chai = require('chai')
 const expect = chai.expect
 
-const Redistribute = require('../lib/Redistribute.js')
+const Redistribute = require('../lib/Redistribute2.js')
 
 let instance
 describe('Redistribute', () => {
@@ -18,20 +18,28 @@ describe('Redistribute', () => {
         autoConnect: false
       })
       expect(instance.subscriptions).to.exist
+      expect(instance.writeRedis).to.not.exist
+      expect(instance.readRedis).to.not.exist
     })
   })
   describe(`.connect()`, () => {
-    it('Connects to redis', async () => {
-      await instance.connect()
-      expect(instance.pool).to.exist
+    it('Connects to redis', done => {
+      instance.connect().then(() => {
+        expect(instance.writeRedis).to.exist
+        expect(instance.readRedis).to.exist
+        done()
+      })
     })
   })
   const testSubFunction = messages => {}
   describe(`.subscribe()`, () => {
     it('Allows a subsciptions to redis streams', async () => {
-      instance.subscribe('testId', '$', testSubFunction)
+      instance.subscribe('testId', '0', testSubFunction)
       expect(Object.keys(instance.subscriptions)).to.have.lengthOf(1)
-      expect(instance.subscriptions['testId']).to.equal(1)
+      expect(instance.subscriptions['testId']).to.deep.equal({
+        subscribers: 1,
+        offset: '0'
+      })
     })
   })
   describe(`.unsubscribe()`, () => {
@@ -53,23 +61,21 @@ describe('Redistribute', () => {
       ).to.equal(true)
     }
 
-    it('Adds events and gets them via subscriptions', async () => {
-      let messages
+    it('Adds events and gets them via subscriptions', done => {
       const testObj = { foo: 'bar' }
-      function testSubFunction2 (msgs) {
-        messages = msgs
+      const testSubFunction2 = messages => {
+        isMessagesWellFormed(messages)
+        expect(messages[0][0]).to.be.a('string')
+
+        expect(messages[0][1][0], 'messages[0][1][0]').to.equal('ADD_TEST')
+        expect(messages[0][1][1], 'messages[0][1][1]').to.deep.equal(testObj)
+
+        instance.unsubscribe('testId2', testSubFunction)
+        done()
       }
-      const addedTimestamp = await instance
-        .subscribe('testId2', '$', testSubFunction2)
+      instance
+        .subscribe('testId2', '0', testSubFunction2)
         .add('testId2', 'ADD_TEST', testObj)
-
-      isMessagesWellFormed(messages)
-      expect(messages[0][0]).to.equal(addedTimestamp)
-
-      expect(messages[0][1][0], 'messages[0][1][0]').to.equal('ADD_TEST')
-      expect(messages[0][1][1], 'messages[0][1][1]').to.deep.equal(testObj)
-
-      instance.unsubscribe('testId2', testSubFunction)
     })
 
     it('Can subscribe to many streams', async () => {
@@ -82,8 +88,8 @@ describe('Redistribute', () => {
         messages4 = msgs
       }
       await instance
-        .subscribe('testId3', '$', testFunc3)
-        .subscribe('testId4', '$', testFunc4)
+        .subscribe('testId3', '0', testFunc3)
+        .subscribe('testId4', '0', testFunc4)
         .add('testId3', 'testId3DATA', { blgeh: 'bar' })
 
       isMessagesWellFormed(messages3)
@@ -96,10 +102,11 @@ describe('Redistribute', () => {
       instance.unsubscribe('testId4', testSubFunction)
     })
   })
-  describe(`.disconnect()`, () => {
+  describe(`.disconnect()`, async () => {
     it('disconnects from redis', async () => {
       await instance.disconnect()
-      expect(instance.pool).to.not.exist
-    }).timeout(5500)
+      expect(instance.writeRedis).to.exist
+      expect(instance.readRedis).to.exist
+    }).timeout(60000)
   })
 })
