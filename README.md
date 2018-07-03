@@ -47,7 +47,7 @@ An example will look quite a bit like an example for a standard WebSocket librar
 
 ## Example
 
-### Server Example
+### Server
 
 ```js
 const server = require('redistribute')({
@@ -78,7 +78,7 @@ server.on('connect', socket => {
 })
 ```
 
-### Client Example
+### Client
 
 ```js
 const client = require('redistribute-client')({

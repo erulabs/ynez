@@ -3,7 +3,15 @@ version: '3'
 services:
   redis:
     image: erulabs/redis-unstable
-    # build: ./inf/images/redis
+    build: ./inf/images/redis
     restart: on-failure
     ports:
       - 6379
+
+  test:
+    build:
+      context: .
+      dockerfile: ./inf/images/test/Dockerfile
+    restart: no
+    links:
+      - redis

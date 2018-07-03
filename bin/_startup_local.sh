@@ -13,16 +13,10 @@ fi
 
 COMPOSE_CMD="docker-compose -p '${PROJECT}' up --force-recreate -d --remove-orphans redis"
 
-DOCKER_CONTAINER_NAME=${DOCKER_CONTAINER_NAME} \
-TAG=dev \
-TARGET=${TARGET:-"local"} \
 docker-compose -p "${PROJECT}" build
 
 echo "$COMPOSE_CMD"
 
 set -e
-DOCKER_CONTAINER_NAME=${DOCKER_CONTAINER_NAME} \
-TAG=dev \
-TARGET=${TARGET:-"local"} \
 ${COMPOSE_CMD} 2>&1 | tee .devlog.plain
 . ./bin/_find_compose_services.sh
