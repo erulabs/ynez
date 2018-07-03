@@ -7,7 +7,7 @@
   "author": "erulabs <seandon.mooy@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "test": "./bin/integration_test.sh"
+    "test": "bash ./bin/integration_test.sh"
   },
   "dependencies": {
     "generic-pool": "^3.4.2",
