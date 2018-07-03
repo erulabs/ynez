@@ -12,7 +12,23 @@ An example will look quite a bit like an example for a standard WebSocket librar
 
 - Redistribute Streams are **shardable**; a fleet of worker machines can work together to handle messages in a stream via "Consumer Groups".
 
-Let's look at an example:
+### Table of Contents
+
+1.  [Examples](#example)
+2.  [API Documentation](#api-documentation)
+  - [Messages](#messages)
+  - [Server](#server)
+      - [Redistribute()](#redistributeoptions)
+      - [.listen()](#redistributelistenoptions)
+      - [.publish()](#async-redistributepublishchannel-)
+      - [Events](#server-events)
+      - [Socket](#socket-events)
+  - [Client](#client)
+      - [Client()](#clientoptions)
+      - [.load()](#async-clientloadchannel)
+      - [.subscribe()](#async-clientsubscribechannel-offset)
+      - [.unsubscribe()](#async-clientunsubscribechannel)
+      - [.publish()](#async-clientpublishchannel-)
 
 ## Example
 
@@ -118,6 +134,15 @@ Where "options" is an object with the following properties:
 | `cert` | **string** |   yes    |    -    | Filepath to SSL certificate                        |
 | `port` | **number** |    no    |  8080   | Port number to listen on for websocket connections |
 
+### async Redistribute.publish(channel, ...)
+
+Send data upstream to the Redis service. See Client.publish() for rules regarding option count rules.
+
+```js
+await server.publish('myChannel', 'some', 'data')
+// returns with locally loaded messages and most recent offset
+```
+
 ### Server Events
 
 - **connect** - A new socket has connected
@@ -149,15 +174,6 @@ Unsubscribes a socket from a given channel. This is called automatically when a 
 ### Socket.emit(channel, messages)
 
 Send data to a connected socket
-
-### async Redistribute.publish(channel, ...)
-
-Send data upstream to the Redis service. See Client.publish() for rules regarding option count rules.
-
-```js
-await server.publish('myChannel', 'some', 'data')
-// returns with locally loaded messages and most recent offset
-```
 
 ## Client
 
