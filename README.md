@@ -1,5 +1,13 @@
 # Redistribute
 
+![CircleCI](https://img.shields.io/circleci/project/github/erulabs/Redistribute.svg?style=for-the-badge)
+![Version](https://img.shields.io/npm/v/redistribute.svg?style=for-the-badge)
+![Downloads](https://img.shields.io/npm/dt/redistribute.svg?style=for-the-badge)
+
+![GitHub Release Date](https://img.shields.io/github/release-date/SubtitleEdit/subtitleedit.svg?style=for-the-badge)
+![License](https://img.shields.io/npm/l/redistribute.svg?style=for-the-badge)
+
+
 A toolkit for building streaming real-time applications using Node.js, [Redis Streams](https://redis.io/topics/streams-intro), WebSockets and localStorage, which aims to dramatically reduce the amount of code and cash required to write reliable, distributed, real-time applications with no single points of failure.
 
 Redistribute has two components, `redistribute`, the server package (a Node.js library), and `redistribute-client`, a browser and Node.js compatible client library,
