@@ -1,4 +1,4 @@
-# Published as erulabs/redis5
+# Published as erulabs/redis-unstable
 
 FROM alpine
 MAINTAINER seandon.mooy@gmail.com
