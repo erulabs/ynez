@@ -12,6 +12,6 @@ services:
     build:
       context: .
       dockerfile: ./inf/images/test/Dockerfile
-    restart: no
+    restart: "no"
     links:
       - redis
