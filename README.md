@@ -1,11 +1,15 @@
-# Redistribute
 
-![CircleCI](https://img.shields.io/circleci/project/github/erulabs/Redistribute.svg?style=for-the-badge)
-![Version](https://img.shields.io/npm/v/redistribute.svg?style=for-the-badge)
-![Downloads](https://img.shields.io/npm/dt/redistribute.svg?style=for-the-badge)
-
-![GitHub Release Date](https://img.shields.io/github/release-date/SubtitleEdit/subtitleedit.svg?style=for-the-badge)
-![License](https://img.shields.io/npm/l/redistribute.svg?style=for-the-badge)
+<div align="center">
+  <img width="194" height="171" src="https://i.imgur.com/cVI0s3w.png">
+  <br /><br />
+  ![Version](https://img.shields.io/npm/v/redistribute.svg?style=for-the-badge)
+  ![CircleCI](https://img.shields.io/circleci/project/github/erulabs/Redistribute.svg?style=for-the-badge)
+  ![Downloads](https://img.shields.io/npm/dt/redistribute.svg?style=for-the-badge)
+  <br /><br />
+  ![GitHub Release Date](https://img.shields.io/github/release-date/SubtitleEdit/subtitleedit.svg?style=for-the-badge)
+  ![License](https://img.shields.io/npm/l/redistribute.svg?style=for-the-badge)
+  <br /><br />
+</div>
 
 
 A toolkit for building streaming real-time applications using Node.js, [Redis Streams](https://redis.io/topics/streams-intro), WebSockets and localStorage, which aims to dramatically reduce the amount of code and cash required to write reliable, distributed, real-time applications with no single points of failure.
