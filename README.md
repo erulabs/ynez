@@ -31,10 +31,11 @@ server.on('connect', socket => {
   socket.on('subscribe', (channel, offset) => {
     // Subscribe to messages from upstream
     // Note that calling `subscribe()` twice on the same channel has no effect
-    socket.subscribe(channel, offset, messages => {
-      // Broadcast messages to all subscribed clients
-      socket.emit(messages)
-    })
+    socket.subscribe(channel, offset)
+    // Forward some or all messages down to clients
+  })
+  socket.on('messages', (channel, messages)) => {
+    socket.emit(channel, messages)
   })
   // Handle message publishing events from users
   socket.on('publish', (channel, message) => {
@@ -51,11 +52,12 @@ const client = require('redistribute-client')({
   targets: ['https://redistribute-api.demo:8080']
 })
 // Load locally stored messages
-client.load('myTestChannel', (messages, lastOffset) => {
+client.load('myTestChannel').then((messages, lastOffset) => {
   // Subscribe to a channel with an optional offset
-  client.subscribe('myTestChannel', lastOffset, messages => {
-    // Do stuff with messages!
-  })
+  client.subscribe('myTestChannel', lastOffset)
+}))
+client.on('messages', messages => {
+  // Do stuff with messages!
 })
 // Ship messages to the server!
 client.publish('myTestChannel', 'TEST_MESSAGE', { foo: 'bar' })
@@ -63,15 +65,46 @@ client.publish('myTestChannel', 'TEST_MESSAGE', { foo: 'bar' })
 
 ## API Documentation
 
+## Messages
+
+Messages events provide arrays of "Message" objects, which have the following properties:
+
+```js
+const Message = {
+  offset: string,
+  key: value,
+  key2: value2...
+}
+```
+
+For example, consider the following:
+
+```js
+// Server
+socket.emit('testChannel', 'TEST_MESSAGE', { foo: 'bar' })
+
+// Client
+client.on('messages', (channel, messages) => {
+  // channel === "testChannel"
+  // messages === [
+  //  {
+  //    offset: "1518951480106-0",
+  //    TEST_MESSAGE: { foo: 'bar' } }
+  // ]
+})
+```
+
 ## Server
 
 ### Redistribute(options)
 
 Where "options" is an object with the following properties:
 
-| Option    | Required | Default | Description                   |
-| :-------- | :------: | :-----: | ----------------------------- |
-| `targets` |   yes    |    -    | An array of Redis server URIs |
+| Option    | Required |     Default      | Description                               |
+| :-------- | :------: | :--------------: | ----------------------------------------- |
+| `targets` |   yes    |        -         | An array of Redis server URIs             |
+| `encode`  |    no    | `JSON.stringify` | A function for encoding published objects |
+| `decode`  |    no    |   `JSON.parse`   | A function for decoding published objects |
 
 ### Redistribute.listen(options)
 
@@ -86,30 +119,22 @@ Where "options" is an object with the following properties:
 ### Server Events
 
 - **connect** - A new socket has connected
-- **disconnect** - A socket has disconnected
+- **error** - An error has been encountered (connection to Redis failed, etc)
 
 ### Socket Events
 
+- **disconnect** - A socket has disconnected
 - **subscribe** - A socket has requested a subscription to a channel
 - **unsubscribe** - A socket no long wants messages from a channel
 - **publish** - A socket has a message to publish for a channel
+- **messages** - Messages have arrived from a subscribed channel
 
-### Socket.subscribe(channel, offset, onMessages)
+### Socket.subscribe(channel, offset)
 
-| Argument     |    type    | Required | Default | Description              |
-| :----------- | :--------: | :------: | :-----: | ------------------------ |
-| `channel`    | **string** |   yes    |    -    | Channel identifier key   |
-| `offset`     | **string** |    no    |   `$`   | Redis stream offset      |
-| `onMessages` | **number** |   yes    |  8080   | Message handler function |
-
-If no `offset` is provided, the `onMessages` handler function is expected in the 2nd argument place, ie:
-
-```js
-// Subscribe with offset
-socket.subscribe(channel, offset, onMessages)
-// Subscribe with default "$" offset
-socket.subscribe(channel, onMessages)
-```
+| Argument  |    type    | Required | Default | Description            |
+| :-------- | :--------: | :------: | :-----: | ---------------------- |
+| `channel` | **string** |   yes    |    -    | Channel identifier key |
+| `offset`  | **string** |    no    |   `$`   | Redis stream offset    |
 
 ### Socket.unsubscribe(channel)
 
@@ -119,27 +144,89 @@ Unsubscribes a socket from a given channel. This is called automatically when a 
 | :-------- | :--------: | :------: | :-----: | --------------------------- |
 | `channel` | **string** |   yes    |    -    | Channel to unsubscribe from |
 
-### Socket.emit()
+### Socket.emit(channel, messages)
 
 Send data to a connected socket
 
-### Redistribute.publish()
+### async Redistribute.publish(channel, ...)
 
-Send data upstream to the Redis service
+Send data upstream to the Redis service. See Client.publish() for rules regarding option count rules.
+
+```js
+await server.publish('myChannel', 'some', 'data')
+// returns with locally loaded messages and most recent offset
+```
 
 ## Client
 
-### RedistributeClient()
+### Client(options)
 
-### RedistributeClient.load()
+Where "options" is an object with the following properties:
 
-### RedistributeClient.subscribe()
+| Option         | Required |     Default      | Description                               |
+| :------------- | :------: | :--------------: | ----------------------------------------- |
+| `targets`      |   yes    |        -         | An array of Redistribute server URIs      |
+| `encode`       |    no    | `JSON.stringify` | A function for encoding published objects |
+| `decode`       |    no    |   `JSON.parse`   | A function for decoding published objects |
+| `localStorage` |    no    |       true       | Automatically store retrieved messages    |
 
-### RedistributeClient.unsubscribe()
+### async Client.load(channel)
 
-### RedistributeClient.publish()
+| Argument  |    type    | Required | Default | Description                                |
+| :-------- | :--------: | :------: | :-----: | ------------------------------------------ |
+| `channel` | **string** |   yes    |    -    | Channel to load locally stored message for |
 
-### Events
+```js
+const { messages, lastOffset } = await client.load('myChannel')
+// returns with locally loaded messages and most recent offset
+```
 
-- `connect`
-- `disconnect`
+### async Client.subscribe(channel, offset)
+
+| Argument  |    type    | Required | Default | Description                                |
+| :-------- | :--------: | :------: | :-----: | ------------------------------------------ |
+| `channel` | **string** |   yes    |    -    | Channel to load locally stored message for |
+| `offset`  | **string** |    no    |   `$`   | Redis stream offset                        |
+
+```js
+await client.subscribe('myChannel')
+// returns true if subscribe message sent successfully
+```
+
+### async Client.unsubscribe(channel)
+
+| Argument  |    type    | Required | Default | Description                 |
+| :-------- | :--------: | :------: | :-----: | --------------------------- |
+| `channel` | **string** |   yes    |    -    | Channel to unsubscribe from |
+
+```js
+await client.unsubscribe('myChannel')
+// returns true if unsubscribe message sent successfully
+```
+
+### async Client.publish(channel, ...)
+
+| Argument  |    type    | Required | Default | Description                    |
+| :-------- | :--------: | :------: | :-----: | ------------------------------ |
+| `channel` | **string** |   yes    |    -    | Channel to publish messages to |
+
+The rest of the arguments are considered key-value pairs, to be used during the Redis Stream XADD. This means that the number of arguments after `channel` must be an even number. For example:
+
+```js
+// Examples of Client Publish
+await client.publish('test', 'foo', 'bar')
+// Success! Returns with new message offset
+await client.publish('test', 'foo')
+// Error! Invalid argument count!
+await client.publish('test', 'foo', { bar: "baz" })
+// Note that object arguments are stringified automatically
+await client.publish('test', 'foo', 'bar', 'baz', 'bam', 'words', 'things')
+// Success! We can post as many key-value pairs as desired
+```
+
+### Client Events
+
+- **connect** - Socket is connected to the server
+- **disconnect** - Socket has been disconnected from the server
+- **messages** - Messages have arrived from a subscribed channel
+- **error** - An error has been received from the server
