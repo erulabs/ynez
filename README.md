@@ -14,21 +14,20 @@ An example will look quite a bit like an example for a standard WebSocket librar
 
 ### Table of Contents
 
-1.  [Examples](#example)
-2.  [API Documentation](#api-documentation)
-  - [Messages](#messages)
-  - [Server](#server)
-      - [Redistribute()](#redistributeoptions)
-      - [.listen()](#redistributelistenoptions)
-      - [.publish()](#async-redistributepublishchannel-)
-      - [Events](#server-events)
-      - [Socket](#socket-events)
-  - [Client](#client)
-      - [Client()](#clientoptions)
-      - [.load()](#async-clientloadchannel)
-      - [.subscribe()](#async-clientsubscribechannel-offset)
-      - [.unsubscribe()](#async-clientunsubscribechannel)
-      - [.publish()](#async-clientpublishchannel-)
+1. [Examples](#example)
+2. [Messages](#messages)
+3. [Server](#server)
+  - [Redistribute()](#redistributeoptions)
+  - [.listen()](#redistributelistenoptions)
+  - [.publish()](#async-redistributepublishchannel-)
+  - [Events](#server-events)
+  - [Socket](#socket-events)
+4. [Client](#client)
+  - [Client()](#clientoptions)
+  - [.load()](#async-clientloadchannel)
+  - [.subscribe()](#async-clientsubscribechannel-offset)
+  - [.unsubscribe()](#async-clientunsubscribechannel)
+  - [.publish()](#async-clientpublishchannel-)
 
 ## Example
 
