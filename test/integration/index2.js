@@ -8,7 +8,7 @@ declare var it: Function;
 const chai = require('chai')
 const expect = chai.expect
 
-const Redistribute = require('../lib/Redistribute2.js')
+const Redistribute = require('../../lib/Redistribute2.js')
 
 let instance
 describe('Redistribute', () => {
