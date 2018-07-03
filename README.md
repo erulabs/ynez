@@ -18,7 +18,7 @@ Redistribute has two components, `redistribute`, the server package (a Node.js l
 
 An example will look quite a bit like an example for a standard WebSocket library, with a few key differences:
 
-- Redistribute Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the message. No need for single points of failure, no need for vertically scaling a single Node.js instance, no need for the `cluster` module or other premature optimizations and complexities.
+- Redistribute Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the messages. No need for single points of failure, no need for vertically scaling a single Node.js instance, no need for the `cluster` module or other premature optimizations and complexities.
 
 - Redistribute Streams are **replayable**; past messages can be re-read from the Redis stream after they have been originally sent (up to a configurable limit).
 

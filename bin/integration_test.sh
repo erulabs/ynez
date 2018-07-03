@@ -8,4 +8,4 @@ else
 fi
 
 REDIS_URIS="${DOCKER_SRV}:${REDIS_PORT}" \
-./node_modules/.bin/mocha test/index.js
+./node_modules/.bin/mocha test/integration/index.js
