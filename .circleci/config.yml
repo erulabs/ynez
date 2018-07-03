@@ -2,7 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: node:10
+      # A debian image with node 10 and docker cli
+      - image: erulabs/circleci-builder:latest
     working_directory: ~/repo
     steps:
       - checkout
