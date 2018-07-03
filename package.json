@@ -1,6 +1,6 @@
 {
   "name": "redistribute",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Distributed and replayable streams, server and client",
   "main": "./lib/Redistribute.js",
   "repository": "git@github.com:erulabs/redistribute",
