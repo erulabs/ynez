@@ -18,12 +18,16 @@ An example will look quite a bit like an example for a standard WebSocket librar
 2. [Messages](#messages)
 3. [Server](#server)
     - [Redistribute()](#redistributeoptions)
+    - [Server Events](#server-events)
     - [.listen()](#redistributelistenoptions)
     - [.publish()](#async-redistributepublishchannel-)
-    - [Events](#server-events)
-    - [Socket](#socket-events)
+    - [Socket Events](#socket-events)
+    - [Socket.subscribe()](#socketsubscribechannel-offset)
+    - [Socket.unsubscribe()](#socketunsubscribechannel)
+    - [Socket.emit()](#socketemitchannel-messages)
 4. [Client](#client)
     - [Client()](#clientoptions)
+    - [Client Events](#client-events)
     - [.load()](#async-clientloadchannel)
     - [.subscribe()](#async-clientsubscribechannel-offset)
     - [.unsubscribe()](#async-clientunsubscribechannel)
@@ -123,6 +127,11 @@ Where "options" is an object with the following properties:
 | `encode`  |    no    | `JSON.stringify` | A function for encoding published objects |
 | `decode`  |    no    |   `JSON.parse`   | A function for decoding published objects |
 
+### Server Events
+
+- **connect** - A new socket has connected
+- **error** - An error has been encountered (connection to Redis failed, etc)
+
 ### Redistribute.listen(options)
 
 Where "options" is an object with the following properties:
@@ -141,11 +150,6 @@ Send data upstream to the Redis service. See Client.publish() for rules regardin
 await server.publish('myChannel', 'some', 'data')
 // returns with locally loaded messages and most recent offset
 ```
-
-### Server Events
-
-- **connect** - A new socket has connected
-- **error** - An error has been encountered (connection to Redis failed, etc)
 
 ### Socket Events
 
@@ -186,6 +190,13 @@ Where "options" is an object with the following properties:
 | `encode`       |    no    | `JSON.stringify` | A function for encoding published objects |
 | `decode`       |    no    |   `JSON.parse`   | A function for decoding published objects |
 | `localStorage` |    no    |       true       | Automatically store retrieved messages    |
+
+### Client Events
+
+- **connect** - Socket is connected to the server
+- **disconnect** - Socket has been disconnected from the server
+- **messages** - Messages have arrived from a subscribed channel
+- **error** - An error has been received from the server
 
 ### async Client.load(channel)
 
@@ -240,10 +251,3 @@ await client.publish('test', 'foo', { bar: "baz" })
 await client.publish('test', 'foo', 'bar', 'baz', 'bam', 'words', 'things')
 // Success! We can post as many key-value pairs as desired
 ```
-
-### Client Events
-
-- **connect** - Socket is connected to the server
-- **disconnect** - Socket has been disconnected from the server
-- **messages** - Messages have arrived from a subscribed channel
-- **error** - An error has been received from the server
