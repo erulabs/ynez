@@ -10,11 +10,13 @@ An example will look quite a bit like an example for a standard WebSocket librar
 
 - Redistribute Streams are **replayable**; past messages can be re-read from the Redis stream after they have been originally sent (up to a configurable limit).
 
-- Redistribute Streams are **shardable**; a fleet of worker machines can work together to handle messages in a queue via Redis Stream "Consumer Groups".
+- Redistribute Streams are **shardable**; a fleet of worker machines can work together to handle messages in a stream via "Consumer Groups".
 
 Let's look at an example:
 
-### Server
+## Example
+
+### Server Example
 
 ```js
 const server = require('redistribute')({
@@ -45,7 +47,7 @@ server.on('connect', socket => {
 })
 ```
 
-### Client
+### Client Example
 
 ```js
 const client = require('redistribute-client')({
