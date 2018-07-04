@@ -6,7 +6,8 @@ ENV NODE_ENV="production"
 
 COPY package.json yarn.lock ./
 
-RUN yarn install && \
+RUN apk add --no-cache bash && \
+    yarn install && \
     rm -rf /var/cache/* /tmp/* /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/yarn && \
     adduser -S nodejs && \
     chown -R nodejs /app
