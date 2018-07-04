@@ -48,7 +48,7 @@ An example will look quite a bit like an example for a standard WebSocket librar
 
 ## About
 
-Redistribute is powered by brand new features in the Redis Database. You should read the [original blog post](http://antirez.com/news/114) and the [official docs](https://redis.io/topics/streams-intro)
+Redistribute is powered by brand new features in the Redis Database - Streams! You should read the [original blog post](http://antirez.com/news/114) and the [official Redis docs](https://redis.io/topics/streams-intro). Redistribute uses [XREAD](https://redis.io/commands/xread) and [XADD](https://redis.io/commands/xadd) to read and write to Redis Streams, and exposes an API that allows easy creation of real-time WebSocket services.
 
 ## Example
 
