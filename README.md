@@ -26,6 +26,7 @@ An example will look quite a bit like an example for a standard WebSocket librar
 
 ### Table of Contents
 
+0. [About](#about)
 1. [Examples](#example)
 2. [Messages](#messages)
 3. [Server](#server)
@@ -44,6 +45,10 @@ An example will look quite a bit like an example for a standard WebSocket librar
     - [.subscribe()](#async-clientsubscribechannel-offset)
     - [.unsubscribe()](#async-clientunsubscribechannel)
     - [.publish()](#async-clientpublishchannel-)
+
+## About
+
+Redistribute is powered by brand new features in the Redis Database. You should read the [original blog post](http://antirez.com/news/114) and the [official docs](https://redis.io/topics/streams-intro)
 
 ## Example
 
