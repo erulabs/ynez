@@ -57,11 +57,13 @@ We also make use of the `UNBLOCK CLIENT` syntax which has only (as of writing) j
 
 An example will look quite a bit like an example for a standard WebSocket library, with a few key differences:
 
-- Ynez Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the messages. No need for single points of failure, no need for vertically scaling a single Node.js instance, no need for the `cluster` module or other premature optimizations and complexities. Optionally add Redis Cluster for a [zero SPOF](https://en.wikipedia.org/wiki/Single_point_of_failure) infrastructure!
+- Ynez Servers are **stateless**; the state of the stream exists in Redis, not Node.js - if an instance crashes or a user reconnects to a different instance, no state is lost and the user sees no difference! Deploy socket based applications without state concerns!
+
+- Ynez Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the messages. No need for the `cluster` module or other premature optimizations and complexities. Optionally add Redis Cluster for a [zero SPOF](https://en.wikipedia.org/wiki/Single_point_of_failure) infrastructure!
 
 - Ynez Streams are **replayable**; past messages can be re-read from the Redis stream after they have been originally sent (up to a configurable limit).
 
-- Ynez Streams are **shardable**; a fleet of worker machines can work together to handle messages in a stream via "Consumer Groups".
+- Ynez Streams are **persistent**-ish; Messages can be sent before any clients are listening, to be collected at a later point, and clients can easily store messages in localStorage for later replay. Streams also have a configurable maximum length, after which messages can be forgotten.
 
 ## Example
 
