@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Project wide variables and helper functions
-PROJECT="redistribute"
+PROJECT="ynez"
 
 # If you're using docker-machine, override host and dockerhost addresses
 DOCKER_SRV="localhost"

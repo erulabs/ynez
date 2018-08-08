@@ -1,28 +1,30 @@
 
 <div align="center">
-  <img width="194" height="171" src="https://i.imgur.com/cVI0s3w.png">
+  <img width="358" height="178" src="https://i.imgur.com/Itz2BNB.jpg">
+  <br />
+  <h2>Distributed and replayable streams</h2>
+
+  Build reliable, real-time applications with JavaScript and Redis faster than ever before
   <br /><br />
-  <a href="https://npm.runkit.com/redistribute"><img src="https://img.shields.io/npm/v/redistribute.svg?style=for-the-badge" /></a>
-  <a href="https://circleci.com/gh/erulabs/redistribute"><img src="https://img.shields.io/circleci/project/github/erulabs/Redistribute.svg?style=for-the-badge" /></a>
-  <img src="https://img.shields.io/npm/dt/redistribute.svg?style=for-the-badge" />
+  <a href="https://npm.runkit.com/ynez"><img src="https://img.shields.io/npm/v/ynez.svg?style=for-the-badge" /></a>
+  <a href="https://circleci.com/gh/erulabs/ynez"><img src="https://img.shields.io/circleci/project/github/erulabs/Ynez.svg?style=for-the-badge" /></a>
+  <img src="https://img.shields.io/npm/dt/ynez.svg?style=for-the-badge" />
   <br /><br />
   <img src="https://img.shields.io/github/release-date/SubtitleEdit/subtitleedit.svg?style=for-the-badge" />
-  <img src="https://img.shields.io/npm/l/redistribute.svg?style=for-the-badge" />
+  <img src="https://img.shields.io/npm/l/ynez.svg?style=for-the-badge" />
   <br /><br />
 </div>
 
 
-**Redistribute** is a toolkit for building streaming real-time applications using Node.js, [Redis Streams](https://redis.io/topics/streams-intro), WebSockets and localStorage, which aims to dramatically reduce the amount of code and cash required to write reliable, distributed, real-time applications with no single points of failure.
+**Ynez** is a toolkit for building streaming real-time applications using Node.js, [Redis Streams](https://redis.io/topics/streams-intro), WebSockets and localStorage, which aims to dramatically reduce the amount of code and cash required to write reliable, distributed, real-time applications with no single points of failure. It is named after the [Santa Ynez River](https://en.wikipedia.org/wiki/Santa_Ynez_River), where [I](https://erulabs.com) grew up, which both feeds and is fed by many smaller creeks and streams.
 
-Redistribute has two components, `redistribute`, the server package (a Node.js library), and `redistribute-client`, a browser and Node.js compatible client library,
+Ynez has two components:
 
-An example will look quite a bit like an example for a standard WebSocket library, with a few key differences:
+`ynez`, the server package, hosts a websocket server and connects to a Redis server supporting the new [Streams](https://redis.io/topics/streams-intro) feature.
 
-- Redistribute Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the messages. No need for single points of failure, no need for vertically scaling a single Node.js instance, no need for the `cluster` module or other premature optimizations and complexities.
+and
 
-- Redistribute Streams are **replayable**; past messages can be re-read from the Redis stream after they have been originally sent (up to a configurable limit).
-
-- Redistribute Streams are **shardable**; a fleet of worker machines can work together to handle messages in a stream via "Consumer Groups".
+`ynez-client`, a browser and Node.js compatible client library, which connects to a `ynez` server via websocket.
 
 ### Table of Contents
 
@@ -30,10 +32,11 @@ An example will look quite a bit like an example for a standard WebSocket librar
 1. [Examples](#example)
 2. [Messages](#messages)
 3. [Server](#server)
-    - [Redistribute()](#redistributeoptions)
+    - [Ynez()](#ynezoptions)
     - [Server Events](#server-events)
-    - [.listen()](#redistributelistenoptions)
-    - [.publish()](#async-redistributepublishchannel-)
+    - [.listen()](#serverlistenoptions)
+    - [.connect()](#serverlistenoptions)
+    - [.publish()](#async-serverpublishchannel-)
     - [Socket Events](#socket-events)
     - [Socket.subscribe()](#socketsubscribechannel-offset)
     - [Socket.unsubscribe()](#socketunsubscribechannel)
@@ -48,14 +51,25 @@ An example will look quite a bit like an example for a standard WebSocket librar
 
 ## About
 
-Redistribute is powered by brand new features in the Redis Database - Streams! You should read the [original blog post](http://antirez.com/news/114) and the [official Redis docs](https://redis.io/topics/streams-intro). Redistribute uses [XREAD](https://redis.io/commands/xread) and [XADD](https://redis.io/commands/xadd) to read and write to Redis Streams, and exposes an API that allows easy creation of real-time WebSocket services.
+Ynez is powered by brand new features in the Redis Database - Streams! You should read the [original blog post](http://antirez.com/news/114) and the [official Redis docs](https://redis.io/topics/streams-intro). Ynez uses [XREAD](https://redis.io/commands/xread) and [XADD](https://redis.io/commands/xadd) to read and write to Redis Streams, and exposes an API that allows easy creation of real-time WebSocket services.
+
+We also make use of the `UNBLOCK CLIENT` syntax which has only (as of writing) just landed in Redis unstable. The `erulabs/redis-unstable` docker image is an easy way to get started.
+
+An example will look quite a bit like an example for a standard WebSocket library, with a few key differences:
+
+- Ynez Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the messages. No need for single points of failure, no need for vertically scaling a single Node.js instance, no need for the `cluster` module or other premature optimizations and complexities. Optionally add Redis Cluster for a [zero SPOF](https://en.wikipedia.org/wiki/Single_point_of_failure) infrastructure!
+
+- Ynez Streams are **replayable**; past messages can be re-read from the Redis stream after they have been originally sent (up to a configurable limit).
+
+- Ynez Streams are **shardable**; a fleet of worker machines can work together to handle messages in a stream via "Consumer Groups".
 
 ## Example
 
 ### Server
 
 ```js
-const server = require('redistribute')({
+const Ynez = require('ynez')
+const server = new Ynez({
   targets: ['localhost:6379', 'another-server:6379']
 })
 // Hoist a websocket server
@@ -86,8 +100,8 @@ server.on('connect', socket => {
 ### Client
 
 ```js
-const client = require('redistribute-client')({
-  targets: ['https://redistribute-api.demo:8080']
+const client = require('ynez-client')({
+  targets: ['https://ynez-api.demo:8080']
 })
 // Load locally stored messages
 client.load('myTestChannel').then((messages, lastOffset) => {
@@ -134,22 +148,28 @@ client.on('messages', (channel, messages) => {
 
 ## Server
 
-### Redistribute(options)
+### Ynez(options)
 
 Where "options" is an object with the following properties:
 
-| Option    | Required |     Default      | Description                               |
-| :-------- | :------: | :--------------: | ----------------------------------------- |
-| `targets` |   yes    |        -         | An array of Redis server URIs             |
-| `encode`  |    no    | `JSON.stringify` | A function for encoding published objects |
-| `decode`  |    no    |   `JSON.parse`   | A function for decoding published objects |
+| Option        | Required |     Default        | Description                               |
+| :------------ | :------: | :--------------:   | ----------------------------------------- |
+| `targets`     |    no    | `["localhost:6379"]` | An array of Redis server URIs             |
+| `autoConnect` |    no    | true               | Calls `.connect()` on construction (connects to Redis) |
+| `encode`      |    no    | `JSON.stringify`   | A function for encoding published objects |
+| `decode`      |    no    |   `JSON.parse`     | A function for decoding published objects |
+
+```js
+const server = new Ynez({ autoConnect: false })
+```
 
 ### Server Events
 
+- **ready** - Connected to Redis
 - **connect** - A new socket has connected
 - **error** - An error has been encountered (connection to Redis failed, etc)
 
-### Redistribute.listen(options)
+### Server.listen(options)
 
 Where "options" is an object with the following properties:
 
@@ -159,12 +179,20 @@ Where "options" is an object with the following properties:
 | `cert` | **string** |   yes    |    -    | Filepath to SSL certificate                        |
 | `port` | **number** |    no    |  8080   | Port number to listen on for websocket connections |
 
-### async Redistribute.publish(channel, ...)
+```js
+const server = new Ynez({ autoConnect: false })
+```
 
-Send data upstream to the Redis service. See Client.publish() for rules regarding option count rules.
+### Server.connect()
+
+Connects to redis - Is called automatically if `autoConnect` (on the Ynez constructor) is false.
+
+### async Server.publish(channel, ...)
+
+Send data upstream to the Redis service. Like [Client.publish()](#async-clientpublishchannel-), this follows the rules of XADD. The number of arguments after the `channel` must be even, and objects will be encoded automatically.
 
 ```js
-await server.publish('myChannel', 'some', 'data')
+await server.publish('myChannel', 'some', { foo: 'data' })
 // returns with locally loaded messages and most recent offset
 ```
 
@@ -203,7 +231,7 @@ Where "options" is an object with the following properties:
 
 | Option         | Required |     Default      | Description                               |
 | :------------- | :------: | :--------------: | ----------------------------------------- |
-| `targets`      |   yes    |        -         | An array of Redistribute server URIs      |
+| `targets`      |   yes    |        -         | An array of Ynez server URIs      |
 | `encode`       |    no    | `JSON.stringify` | A function for encoding published objects |
 | `decode`       |    no    |   `JSON.parse`   | A function for decoding published objects |
 | `localStorage` |    no    |       true       | Automatically store retrieved messages    |
@@ -259,12 +287,13 @@ The rest of the arguments are considered key-value pairs, to be used during the 
 
 ```js
 // Examples of Client Publish
-await client.publish('test', 'foo', 'bar')
-// Success! Returns with new message offset
-await client.publish('test', 'foo')
-// Error! Invalid argument count!
-await client.publish('test', 'foo', { bar: "baz" })
-// Note that object arguments are stringified automatically
-await client.publish('test', 'foo', 'bar', 'baz', 'bam', 'words', 'things')
-// Success! We can post as many key-value pairs as desired
+await client.publish('test', 'foo', 'bar') // Success! Returns with new message offset
+await client.publish('test', 'foo') // Error! Invalid argument count!
+await client.publish('test', 'foo', { bar: "baz" }) // Note that object arguments are stringified automatically
+await client.publish('test', 'foo', 'bar', 'baz', 'bam', 'words', 'things') // Success!
 ```
+
+
+## Internal subsciption model
+
+Each Ynez server has a single list of channels to be subscribed to.

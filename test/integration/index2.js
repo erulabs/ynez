@@ -8,13 +8,13 @@ declare var it: Function;
 const chai = require('chai')
 const expect = chai.expect
 
-const Redistribute = require('../../lib/Redistribute2.js')
+const Ynez = require('../../lib/Ynez2.js')
 
 let instance
-describe('Redistribute', () => {
-  describe(`new Redistribute()`, () => {
+describe('Ynez', () => {
+  describe(`new Ynez()`, () => {
     it('Creates without connecting', () => {
-      instance = new Redistribute(process.env.REDIS_URIS || '', {
+      instance = new Ynez(process.env.REDIS_URIS || '', {
         autoConnect: false
       })
       expect(instance.subscriptions).to.exist

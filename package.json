@@ -1,9 +1,9 @@
 {
-  "name": "redistribute",
-  "version": "0.0.2",
+  "name": "ynez",
+  "version": "0.0.3",
   "description": "Distributed and replayable streams, server and client",
-  "main": "./lib/Redistribute.js",
-  "repository": "git@github.com:erulabs/redistribute",
+  "main": "./lib/Ynez.js",
+  "repository": "git@github.com:erulabs/ynez",
   "author": "erulabs <seandon.mooy@gmail.com>",
   "license": "MIT",
   "scripts": {
