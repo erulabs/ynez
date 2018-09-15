@@ -1,10 +1,10 @@
 
 <div align="center">
-  <img width="358" height="178" src="https://i.imgur.com/Itz2BNB.jpg">
+  <img width="358" height="178" src="https://i.imgur.com/LdubfN6.jpg">
   <br />
-  <h2>Distributed and replayable streams</h2>
+  <h2>Replayable Shardable Streams</h2>
 
-  Build reliable, real-time applications with JavaScript and Redis faster than ever before
+  Build reliable, real-time, stateless applications with Node.js and Redis faster than ever before
   <br /><br />
   <a href="https://npm.runkit.com/ynez"><img src="https://img.shields.io/npm/v/ynez.svg?style=for-the-badge" /></a>
   <a href="https://circleci.com/gh/erulabs/ynez"><img src="https://img.shields.io/circleci/project/github/erulabs/Ynez.svg?style=for-the-badge" /></a>
@@ -16,15 +16,70 @@
 </div>
 
 
-**Ynez** is a toolkit for building streaming real-time applications using Node.js, [Redis Streams](https://redis.io/topics/streams-intro), WebSockets and localStorage, which aims to dramatically reduce the amount of code and cash required to write reliable, distributed, real-time applications with no single points of failure. It is named after the [Santa Ynez River](https://en.wikipedia.org/wiki/Santa_Ynez_River), where [I](https://erulabs.com) grew up, which both feeds and is fed by many smaller creeks and streams.
+**Ynez** (pronounced _e-nez_) is a toolkit for building streaming real-time applications using Node.js, [Redis Streams](https://redis.io/topics/streams-intro), WebSockets and localStorage, which aims to dramatically reduce the amount of code, cash and cognitive overhead required to write reliable, distributed, real-time applications with no single points of failure.
 
-Ynez has two components:
+Ynez is two packages:
 
-`ynez`, the server package, hosts a websocket server and connects to a Redis server supporting the new [Streams](https://redis.io/topics/streams-intro) feature.
+`ynez`, the server package
+- hosts a websocket server
+- connects to a Redis server supporting the new [Streams](https://redis.io/topics/streams-intro) feature.
 
-and
+`ynez-client`, the client package
+- a browser and Node.js compatible client library
+- connects to a `ynez` server via websocket
 
-`ynez-client`, a browser and Node.js compatible client library, which connects to a `ynez` server via websocket.
+## Example
+
+##### Server
+
+```js
+// An example server looks very much like a Socket.io example, aside from the connections to Redis.
+// Everything after server.listen() is the default behavior
+// if you define your own `connect` handler, it will overwrite this default.
+const Ynez = require('ynez')
+const server = new Ynez(['localhost:6379', 'another-server:6379'])
+server.listen({ key: '...', cert: '...', port: 8080 })
+
+server.on('connect', socket => {
+  socket.on('subscribe', (channel, offset) => {
+    // TODO: Filter channel permissions?
+    socket.subscribe(channel, offset)
+  })
+  socket.on('messages', (channel, messages) => {
+    // TODO: Filter messages? Side effects or triggered actions?
+    socket.emit(channel, messages)
+  })
+  socket.on('publish', (channel, message) => {
+    // TODO: Validate / Audit messages from users
+    server.publish(channel, message, { maxLength: 5000 })
+  })
+})
+```
+
+##### Client
+
+```js
+// A simple client example also looks very much like a traditional WebSocket:
+const client = require('ynez-client')('https://ynez-api.demo:8080')
+client.on('messages', messages => { doStuff(messages) }) // Read...
+client.publish('myTestChannel', 'TEST_MESSAGE', { foo: 'bar' }) // Write...
+
+// You wont receive any messages unless you subscribe to a channel:
+client.subscribe('myTestChannel', { localStorage: true })
+```
+
+But while it may look exactly like a normal WebSocket tutorial, we get a whole lot of features out of the box:
+
+
+- Ynez Servers are **stateless**; the state of the stream exists in Redis, not Node.js - if an instance crashes or a user reconnects to a different instance, no state is lost and the user sees no difference! Deploy socket based applications without state concerns!
+
+- Ynez Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the messages. No need for the `cluster` module or other premature optimizations and complexities. Optionally add Redis Cluster for a [zero SPOF](https://en.wikipedia.org/wiki/Single_point_of_failure) infrastructure!
+
+- Ynez Streams are **replayable**; past messages can be re-read from the Redis stream after they have been originally sent (up to a configurable limit).
+
+- Ynez Streams are **persistent**-ish; Messages can be sent before any clients are listening, to be collected at a later point, and clients can easily store messages in localStorage for later replay. Streams also have a configurable maximum length, after which messages can be forgotten.
+
+- State checkpoints, consumer groups, Redis Cluster support, queues and more!
 
 ### Table of Contents
 
@@ -51,71 +106,11 @@ and
 
 ## About
 
-Ynez is powered by brand new features in the Redis Database - Streams! You should read the [original blog post](http://antirez.com/news/114) and the [official Redis docs](https://redis.io/topics/streams-intro). Ynez uses [XREAD](https://redis.io/commands/xread) and [XADD](https://redis.io/commands/xadd) to read and write to Redis Streams, and exposes an API that allows easy creation of real-time WebSocket services.
+The project is named after the [Santa Ynez River](https://en.wikipedia.org/wiki/Santa_Ynez_River), where [I](https://erulabs.com) grew up, which both feeds and is fed by many smaller creeks and streams.
+
+Ynez is powered by brand new features in the Redis Database - Streams! Ynez uses [XREAD](https://redis.io/commands/xread) and [XADD](https://redis.io/commands/xadd) to read and write to Redis Streams, and exposes an API that allows easy creation of real-time WebSocket services. You should read the [original blog post](http://antirez.com/news/114) and the [official Redis docs](https://redis.io/topics/streams-intro) if you're interested in learning more!
 
 We also make use of the `UNBLOCK CLIENT` syntax which has only (as of writing) just landed in Redis unstable. The `erulabs/redis-unstable` docker image is an easy way to get started.
-
-An example will look quite a bit like an example for a standard WebSocket library, with a few key differences:
-
-- Ynez Servers are **stateless**; the state of the stream exists in Redis, not Node.js - if an instance crashes or a user reconnects to a different instance, no state is lost and the user sees no difference! Deploy socket based applications without state concerns!
-
-- Ynez Streams are **distributed**; any other server (and their clients) which is subscribed to a channel will receive the messages. No need for the `cluster` module or other premature optimizations and complexities. Optionally add Redis Cluster for a [zero SPOF](https://en.wikipedia.org/wiki/Single_point_of_failure) infrastructure!
-
-- Ynez Streams are **replayable**; past messages can be re-read from the Redis stream after they have been originally sent (up to a configurable limit).
-
-- Ynez Streams are **persistent**-ish; Messages can be sent before any clients are listening, to be collected at a later point, and clients can easily store messages in localStorage for later replay. Streams also have a configurable maximum length, after which messages can be forgotten.
-
-## Example
-
-### Server
-
-```js
-const Ynez = require('ynez')
-const server = new Ynez({
-  targets: ['localhost:6379', 'another-server:6379']
-})
-// Hoist a websocket server
-server.listen({
-  key: '...',
-  cert: '...',
-  port: 8080
-})
-// Handle subscription requests from users
-server.on('connect', socket => {
-  socket.on('subscribe', (channel, offset) => {
-    // Subscribe to messages from upstream
-    // Note that calling `subscribe()` twice on the same channel has no effect
-    socket.subscribe(channel, offset)
-    // Forward some or all messages down to clients
-  })
-  socket.on('messages', (channel, messages)) => {
-    socket.emit(channel, messages)
-  })
-  // Handle message publishing events from users
-  socket.on('publish', (channel, message) => {
-    // Validate / Audit messages from users, then pass them upstream!
-    server.publish(channel, message)
-  })
-})
-```
-
-### Client
-
-```js
-const client = require('ynez-client')({
-  targets: ['https://ynez-api.demo:8080']
-})
-// Load locally stored messages
-client.load('myTestChannel').then((messages, lastOffset) => {
-  // Subscribe to a channel with an optional offset
-  client.subscribe('myTestChannel', lastOffset)
-}))
-client.on('messages', messages => {
-  // Do stuff with messages!
-})
-// Ship messages to the server!
-client.publish('myTestChannel', 'TEST_MESSAGE', { foo: 'bar' })
-```
 
 ## API Documentation
 
@@ -165,6 +160,8 @@ Where "options" is an object with the following properties:
 const server = new Ynez({ autoConnect: false })
 ```
 
+If the "options" argument is a string, or an array of strings, it is assumed to be the `targets` option.
+
 ### Server Events
 
 - **ready** - Connected to Redis
@@ -177,8 +174,8 @@ Where "options" is an object with the following properties:
 
 | Option |    type    | Required | Default | Description                                        |
 | :----- | :--------: | :------: | :-----: | -------------------------------------------------- |
-| `key`  | **string** |   yes    |    -    | Filepath to SSL key                                |
-| `cert` | **string** |   yes    |    -    | Filepath to SSL certificate                        |
+| `key`  | **string** |   yes    |    -    | SSL key                                            |
+| `cert` | **string** |   yes    |    -    | SSL certificate                                    |
 | `port` | **number** |    no    |  8080   | Port number to listen on for websocket connections |
 
 ```js
@@ -294,8 +291,3 @@ await client.publish('test', 'foo') // Error! Invalid argument count!
 await client.publish('test', 'foo', { bar: "baz" }) // Note that object arguments are stringified automatically
 await client.publish('test', 'foo', 'bar', 'baz', 'bam', 'words', 'things') // Success!
 ```
-
-
-## Internal subsciption model
-
-Each Ynez server has a single list of channels to be subscribed to.
