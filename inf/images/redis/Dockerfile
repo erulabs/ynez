@@ -11,9 +11,6 @@ RUN git clone https://github.com/antirez/redis && \
     cd redis && \
     git fetch origin unstable && \
     git checkout unstable && \
-    # curl -s https://github.com/antirez/redis/archive/${REDIS_VERSION}.tar.gz -o ${REDIS_VERSION}.tar.gz && \
-    # tar -zxf ${REDIS_VERSION}.tar.gz && \
-    # cd redis-${REDIS_VERSION} && \
     make && \
     make install && \
     mkdir -p /etc/redis && \
