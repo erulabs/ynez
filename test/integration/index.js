@@ -14,13 +14,12 @@ let instance
 describe('Ynez', () => {
   describe(`new Ynez()`, () => {
     it('Creates without connecting', () => {
-      instance = new Ynez({
-        targets: (process.env.REDIS_URIS || '').split(','),
+      instance = new Ynez(process.env.REDIS_URIS || '', {
         autoConnect: false
       })
-      expect(instance.subscriptions).to.exist
-      expect(instance.writeRedis).to.not.exist
-      expect(instance.readRedis).to.not.exist
+      expect(instance.subscriptions, '.subscriptions').to.exist
+      expect(instance.writeRedis, '.writeRedis').to.not.exist
+      expect(instance.readRedis, '.readRedis').to.not.exist
     })
   })
   describe(`.connect()`, () => {
@@ -84,23 +83,26 @@ describe('Ynez', () => {
       let messages4
       const testFunc3 = msgs => {
         messages3 = msgs
+        if (messages3 && messages4) doTest()
       }
       const testFunc4 = msgs => {
         messages4 = msgs
+        if (messages3 && messages4) doTest()
+      }
+      const doTest = async () => {
+        isMessagesWellFormed(messages3)
+        expect(messages4).to.equal(undefined)
+
+        await instance.add('testId4', 'testId4DATA', { blgeh: 'bar' })
+        isMessagesWellFormed(messages4)
+
+        instance.unsubscribe('testId3', testSubFunction)
+        instance.unsubscribe('testId4', testSubFunction)
       }
       await instance
         .subscribe('testId3', '0', testFunc3)
         .subscribe('testId4', '0', testFunc4)
         .add('testId3', 'testId3DATA', { blgeh: 'bar' })
-
-      isMessagesWellFormed(messages3)
-      expect(messages4).to.equal(undefined)
-
-      await instance.add('testId4', 'testId4DATA', { blgeh: 'bar' })
-      isMessagesWellFormed(messages4)
-
-      instance.unsubscribe('testId3', testSubFunction)
-      instance.unsubscribe('testId4', testSubFunction)
     })
   })
   describe(`.disconnect()`, async () => {

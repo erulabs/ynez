@@ -15,5 +15,5 @@ if [[ "$1" == "--docker" ]]; then
   echo "-> Via docker"
   docker-compose -p "${PROJECT}" run test
 else
-  REDIS_URIS="${DOCKER_SRV}:${REDIS_PORT}" ./node_modules/.bin/mocha test/integration/index2.js
+  REDIS_URIS="${DOCKER_SRV}:${REDIS_PORT}" ./node_modules/.bin/mocha test/integration/index.js
 fi
