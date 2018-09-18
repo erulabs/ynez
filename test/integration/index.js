@@ -8,13 +8,13 @@ declare var it: Function;
 const chai = require('chai')
 const expect = chai.expect
 
-const Ynez = require('../../lib/Ynez2.js')
+const Ynez = require('../../lib/Ynez.js')
 
 let instance
 describe('Ynez', () => {
   describe(`new Ynez()`, () => {
     it('Creates without connecting', () => {
-      instance = new Ynez(process.env.REDIS_URIS || '', {
+      instance = new Ynez(process.env.REDIS_URIS || 'redis:6379', {
         autoConnect: false
       })
       expect(instance.subscriptions, '.subscriptions').to.exist
@@ -24,7 +24,7 @@ describe('Ynez', () => {
   })
   describe(`.connect()`, () => {
     it('Connects to redis', done => {
-      instance.connect().then(() => {
+      instance.connect(process.env.REDIS_URIS || 'redis:6379').then(() => {
         expect(instance.writeRedis).to.exist
         expect(instance.readRedis).to.exist
         done()

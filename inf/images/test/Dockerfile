@@ -1,8 +1,6 @@
-FROM node:10.4.0-alpine
+FROM node:10-alpine
 
 WORKDIR /app
-
-ENV NODE_ENV="production"
 
 COPY package.json yarn.lock ./
 
@@ -12,10 +10,13 @@ RUN apk add --no-cache bash && \
     adduser -S nodejs && \
     chown -R nodejs /app
 
-COPY bin/_variables.sh bin/integration_test.sh ./bin/
+COPY bin/ ./bin/
+COPY lib/ ./lib/
+COPY test/ ./test/
+COPY .flowconfig .eslintrc.json .editorconfig ./
 
 RUN chown -R nodejs /app
 
 USER nodejs
 
-CMD ["./bin/integration_test.sh"]
+CMD ["./bin/test.sh"]

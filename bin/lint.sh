@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 echo -e "\nESLINT:"
-./node_modules/.bin/eslint src
+./node_modules/.bin/eslint lib
 
 echo -e "\nFlow:"
-./node_modules/.bin/flow check src
+[ -z ${CI} ] && ./node_modules/.bin/flow check lib
 
 echo -e "\nLint OK"

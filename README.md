@@ -7,7 +7,7 @@
   Build reliable, real-time, stateless applications with Node.js and Redis faster than ever before
   <br /><br />
   <a href="https://npm.runkit.com/ynez"><img src="https://img.shields.io/npm/v/ynez.svg?style=for-the-badge" /></a>
-  <a href="https://circleci.com/gh/erulabs/ynez"><img src="https://img.shields.io/circleci/project/github/erulabs/Ynez.svg?style=for-the-badge" /></a>
+  <a href="https://circleci.com/gh/erulabs/ynez"><img src="https://img.shields.io/circleci/project/github/erulabs/ynez.svg?style=for-the-badge" /></a>
   <img src="https://img.shields.io/npm/dt/ynez.svg?style=for-the-badge" />
   <br /><br />
   <img src="https://img.shields.io/github/release-date/SubtitleEdit/subtitleedit.svg?style=for-the-badge" />

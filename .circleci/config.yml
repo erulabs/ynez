@@ -12,28 +12,6 @@ jobs:
           exclusive: false
           version: 17.06.1-ce
 
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-
-      - run:
-          name: Install Dependencies
-          command: yarn install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ arch }}-{{ checksum "yarn.lock" }}
-
-      # Test wrapper - all unit / static / lint tests should occur here
-      - run:
-          name: Unit testing...
-          command: |
-            chmod +x ./bin/*.sh
-            chmod +x ./.circleci/*.sh
-            ./bin/lint.sh
-            ./bin/unit_test.sh
-
       - run:
           name: Integration testing...
           command: ./.circleci/e2e_wrapper.sh ci

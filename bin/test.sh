@@ -7,6 +7,9 @@ function error_handler {
   exit 1
 }
 
+echo -e "======================\nSyntax tests:"
+./bin/lint.sh
+
 echo -e "======================\nIntegration tests:"
 TARGET=${TARGET:-local} ./bin/integration_test.sh
 

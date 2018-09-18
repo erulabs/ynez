@@ -9,11 +9,7 @@ if [[ -z ${CI} ]]; then
   else
     . ./bin/_find_compose_services.sh
   fi
-fi
-
-if [[ "$1" == "--docker" ]]; then
-  echo "-> Via docker"
-  docker-compose -p "${PROJECT}" run test
-else
   REDIS_URIS="${DOCKER_SRV}:${REDIS_PORT}" ./node_modules/.bin/mocha test/integration/index.js
+else
+  ./node_modules/.bin/mocha test/integration/index.js
 fi
