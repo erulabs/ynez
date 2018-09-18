@@ -17,9 +17,9 @@ describe('Ynez', () => {
       instance = new Ynez(process.env.REDIS_URIS || '', {
         autoConnect: false
       })
-      expect(instance.subscriptions).to.exist
-      expect(instance.writeRedis).to.not.exist
-      expect(instance.readRedis).to.not.exist
+      expect(instance.subscriptions, '.subscriptions').to.exist
+      expect(instance.writeRedis, '.writeRedis').to.not.exist
+      expect(instance.readRedis, '.readRedis').to.not.exist
     })
   })
   describe(`.connect()`, () => {

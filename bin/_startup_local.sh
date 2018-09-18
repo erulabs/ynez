@@ -11,7 +11,7 @@ if [[ "$@" =~ .*\-\-clean.* ]]; then
   ./bin/clean.sh
 fi
 
-COMPOSE_CMD="docker-compose -p '${PROJECT}' up --force-recreate -d --remove-orphans redis"
+COMPOSE_CMD="docker-compose -p '${PROJECT}' up -d --remove-orphans redis"
 
 docker-compose -p "${PROJECT}" build
 
