@@ -1,0 +1,14 @@
+{
+  "name": "ynez",
+  "version": "0.1.0",
+  "description": "Build fast, reliable, real-time applications with Node.js and Redis easier than ever before",
+  "main": "lib/index.js",
+  "repository": "git@github.com:erulabs/ynez",
+  "author": "Seandon \"Erulabs\" Mooy <seandon@kubesail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "ioredis": "^4.17.3",
+    "ws": "^7.3.1"
+  }
+}
